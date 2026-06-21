@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { Command } from "commander";
 import Anthropic from "@anthropic-ai/sdk";
 import { createInterface } from "node:readline/promises";
