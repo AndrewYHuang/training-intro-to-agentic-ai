@@ -31,7 +31,10 @@
 1. Add a small tool registry in code.
 2. Include two tools:
    - `current_time`: returns current local date/time.
-   - `add_numbers`: adds two numbers from a prompt like `add 12 and 30` (also supports decimals).
+   - `web_search`: fetches a short web result from a curl-able endpoint (DuckDuckGo Instant Answer API):
+     ```bash
+     curl "https://api.duckduckgo.com/?q=github+copilot&format=json"
+     ```
 3. Add short descriptions so tool purpose is clear.
 
 ---
@@ -44,7 +47,7 @@
    - send tool result back into assistant response
 3. Validate with scripted prompts:
    - `What time is it?`
-   - `add 12 and 30`
+   - `Search the web for github copilot`
 
 ---
 
@@ -52,10 +55,7 @@
 1. Run the app and demo one full conversation.
 2. Show at least one successful tool call.
 3. Recap what was built and what can be extended next (more tools, real LLM API, conversation memory).
-4. Optional extension: add a `web_search` tool using a curl-able endpoint such as DuckDuckGo Instant Answer API:
-   ```bash
-   curl "https://api.duckduckgo.com/?q=github+copilot&format=json"
-   ```
+4. Explain how the `web_search` tool can be improved next (better parsing, richer sources, retries).
 
 ---
 
