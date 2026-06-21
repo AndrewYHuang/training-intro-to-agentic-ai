@@ -52,7 +52,14 @@ const tools: Record<ToolName, ToolDefinition> = {
         return "No search query provided.";
       }
 
-      const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_redirect=1&no_html=1`;
+      const searchBaseUrl = "https://api.duckduckgo.com/";
+      const searchParams = new URLSearchParams({
+        q: query,
+        format: "json",
+        no_redirect: "1",
+        no_html: "1",
+      });
+      const url = `${searchBaseUrl}?${searchParams.toString()}`;
       const response = await fetch(url);
       if (!response.ok) {
         return `Search failed with status ${response.status}.`;
@@ -85,12 +92,7 @@ function getToolDefinitions() {
 }
 
 async function runTool(toolCall: ToolCall): Promise<string> {
-  const tool = tools[toolCall.name];
-  if (!tool) {
-    return `Unknown tool: ${toolCall.name}`;
-  }
-
-  return tool.run(toolCall.args);
+  return tools[toolCall.name].run(toolCall.args);
 }
 
 function isToolName(value: string): value is ToolName {
