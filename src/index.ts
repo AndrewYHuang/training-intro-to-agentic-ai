@@ -1,91 +1,173 @@
 import { Command } from "commander";
+import Anthropic from "@anthropic-ai/sdk";
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 
-type ToolName = "current_time" | "add_numbers";
+type ToolName = "current_time" | "web_search";
 
 type ToolCall = {
   name: ToolName;
-  args: Record<string, string | number>;
+  args: Record<string, unknown>;
 };
 
 type ToolDefinition = {
   name: ToolName;
   description: string;
-  run: (args: Record<string, string | number>) => string;
+  inputSchema: {
+    type: "object";
+    properties?: unknown | null;
+    required?: string[] | null;
+    [key: string]: unknown;
+  };
+  run: (args: Record<string, unknown>) => Promise<string>;
 };
-
-// Matches prompts like "add 12 and 30" with optional negatives/decimals.
-const ADD_NUMBERS_PATTERN = /add\s+(-?\d+(?:\.\d+)?)\s+and\s+(-?\d+(?:\.\d+)?)/i;
 
 const tools: Record<ToolName, ToolDefinition> = {
   current_time: {
     name: "current_time",
     description: "Get the current local date and time",
-    run: () => new Date().toLocaleString(),
+    inputSchema: {
+      type: "object",
+      properties: {},
+      required: [],
+    },
+    run: async () => new Date().toLocaleString(),
   },
-  add_numbers: {
-    name: "add_numbers",
-    description: "Add two numbers",
-    run: (args) => {
-      const a = parseFloat(String(args.a));
-      const b = parseFloat(String(args.b));
-      return `${a + b}`;
+  web_search: {
+    name: "web_search",
+    description: "Search the web and return a concise result summary",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "Search query string",
+        },
+      },
+      required: ["query"],
+    },
+    run: async (args) => {
+      const query = String(args.query ?? "").trim();
+      if (!query) {
+        return "No search query provided.";
+      }
+
+      const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_redirect=1&no_html=1`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        return `Search failed with status ${response.status}.`;
+      }
+
+      const data = (await response.json()) as {
+        Answer?: string;
+        AbstractText?: string;
+        Heading?: string;
+        RelatedTopics?: Array<{ Text?: string }>;
+      };
+
+      const summary =
+        data.Answer ||
+        data.AbstractText ||
+        data.RelatedTopics?.find((topic) => topic.Text)?.Text ||
+        "No useful result found.";
+      const heading = data.Heading ? `${data.Heading}: ` : "";
+      return `${heading}${summary}`;
     },
   },
 };
 
-function pickTool(userInput: string): ToolCall | null {
-  const normalized = userInput.toLowerCase();
-
-  if (
-    normalized.includes("time") ||
-    normalized.includes("clock") ||
-    normalized.includes("date")
-  ) {
-    return { name: "current_time", args: {} };
-  }
-
-  const addMatch = normalized.match(ADD_NUMBERS_PATTERN);
-  if (addMatch) {
-    return {
-      name: "add_numbers",
-      args: {
-        a: Number(addMatch[1]),
-        b: Number(addMatch[2]),
-      },
-    };
-  }
-
-  return null;
+function getToolDefinitions() {
+  return Object.values(tools).map((tool) => ({
+    name: tool.name,
+    description: tool.description,
+    input_schema: tool.inputSchema,
+  }));
 }
 
-function respondWithoutTool(userInput: string): string {
-  const toolSummary = Object.values(tools)
-    .map((tool) => `${tool.name} (${tool.description})`)
-    .join(", ");
+async function runTool(toolCall: ToolCall): Promise<string> {
+  const tool = tools[toolCall.name];
+  if (!tool) {
+    return `Unknown tool: ${toolCall.name}`;
+  }
 
-  return `I can help with that. I currently support these tools: ${toolSummary}. Try: "What time is it?" or "add 12 and 30". You said: "${userInput}"`;
+  return tool.run(toolCall.args);
 }
 
-function respondWithToolResult(userInput: string, toolCall: ToolCall, toolResult: string): string {
-  if (toolCall.name === "current_time") {
-    return `The current local time is ${toolResult}.`;
+async function getAssistantResponse(
+  anthropic: Anthropic,
+  messages: Anthropic.Messages.MessageParam[],
+): Promise<string> {
+  let response = await anthropic.messages.create({
+    model: "claude-sonnet-4-5",
+    max_tokens: 1024,
+    tools: getToolDefinitions(),
+    messages,
+  });
+
+  while (response.stop_reason === "tool_use") {
+    const toolResults: Anthropic.Messages.ToolResultBlockParam[] = [];
+
+    for (const contentBlock of response.content) {
+      if (contentBlock.type !== "tool_use") {
+        continue;
+      }
+
+      const toolResult = await runTool({
+        name: contentBlock.name as ToolName,
+        args: (contentBlock.input as Record<string, unknown>) ?? {},
+      });
+
+      toolResults.push({
+        type: "tool_result",
+        tool_use_id: contentBlock.id,
+        content: toolResult,
+      });
+    }
+
+    messages.push({
+      role: "assistant",
+      content: response.content,
+    });
+    messages.push({
+      role: "user",
+      content: toolResults,
+    });
+
+    response = await anthropic.messages.create({
+      model: "claude-sonnet-4-5",
+      max_tokens: 1024,
+      tools: getToolDefinitions(),
+      messages,
+    });
   }
 
-  if (toolCall.name === "add_numbers") {
-    return `The result is ${toolResult}.`;
-  }
+  messages.push({
+    role: "assistant",
+    content: response.content,
+  });
 
-  return `Tool result for "${userInput}": ${toolResult}`;
+  return (
+    response.content
+      .filter((contentBlock) => contentBlock.type === "text")
+      .map((contentBlock) => contentBlock.text)
+      .join("\n")
+      .trim() || "(No text response)"
+  );
 }
 
 async function startChat() {
-  const rl = createInterface({ input, output });
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    throw new Error("Missing ANTHROPIC_API_KEY environment variable.");
+  }
 
-  console.log("CLI Agent (happy path)");
+  const anthropic = new Anthropic({ apiKey });
+  const rl = createInterface({ input, output });
+  const messages: Anthropic.Messages.MessageParam[] = [];
+
+  console.log("CLI Agent (Claude Messages API tool use)");
   console.log('Type "exit" to quit.');
-  console.log('Try: "What time is it?" or "add 12 and 30"');
+  console.log('Try: "What time is it?" or "Search the web for github copilot"');
 
   while (true) {
     const userInput = (await rl.question("you> ")).trim();
@@ -93,16 +175,8 @@ async function startChat() {
       break;
     }
 
-    const toolCall = pickTool(userInput);
-
-    if (!toolCall) {
-      console.log(`assistant> ${respondWithoutTool(userInput)}`);
-      continue;
-    }
-
-    const tool = tools[toolCall.name];
-    const toolResult = tool.run(toolCall.args);
-    const finalReply = respondWithToolResult(userInput, toolCall, toolResult);
+    messages.push({ role: "user", content: userInput });
+    const finalReply = await getAssistantResponse(anthropic, messages);
     console.log(`assistant> ${finalReply}`);
   }
 
