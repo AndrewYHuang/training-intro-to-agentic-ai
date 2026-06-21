@@ -15,6 +15,9 @@ type ToolDefinition = {
   run: (args: Record<string, string | number>) => string;
 };
 
+// Matches prompts like "add 12 and 30" with optional negatives/decimals.
+const ADD_NUMBERS_PATTERN = /add\s+(-?\d+(?:\.\d+)?)\s+and\s+(-?\d+(?:\.\d+)?)/i;
+
 const tools: Record<ToolName, ToolDefinition> = {
   current_time: {
     name: "current_time",
@@ -25,8 +28,8 @@ const tools: Record<ToolName, ToolDefinition> = {
     name: "add_numbers",
     description: "Add two numbers",
     run: (args) => {
-      const a = Number(args.a);
-      const b = Number(args.b);
+      const a = parseFloat(String(args.a));
+      const b = parseFloat(String(args.b));
       return `${a + b}`;
     },
   },
@@ -43,7 +46,7 @@ function pickTool(userInput: string): ToolCall | null {
     return { name: "current_time", args: {} };
   }
 
-  const addMatch = userInput.match(/add\s+(-?\d+(?:\.\d+)?)\s+and\s+(-?\d+(?:\.\d+)?)/i);
+  const addMatch = normalized.match(ADD_NUMBERS_PATTERN);
   if (addMatch) {
     return {
       name: "add_numbers",
@@ -58,7 +61,11 @@ function pickTool(userInput: string): ToolCall | null {
 }
 
 function respondWithoutTool(userInput: string): string {
-  return `I can help with that. I currently support two tools: current time and simple addition. Try: "What time is it?" or "add 12 and 30". You said: "${userInput}"`;
+  const toolSummary = Object.values(tools)
+    .map((tool) => `${tool.name} (${tool.description})`)
+    .join(", ");
+
+  return `I can help with that. I currently support these tools: ${toolSummary}. Try: "What time is it?" or "add 12 and 30". You said: "${userInput}"`;
 }
 
 function respondWithToolResult(userInput: string, toolCall: ToolCall, toolResult: string): string {

@@ -9,7 +9,7 @@
 ---
 
 ### Milestone 1: CLI scaffold (8 min)
-1. Open `/home/runner/work/training-intro-to-agentic-ai/training-intro-to-agentic-ai/src/index.ts`.
+1. Open `src/index.ts`.
 2. Create a runnable CLI entrypoint.
 3. Add an input loop that accepts user messages.
 4. Confirm it works with:
@@ -31,7 +31,7 @@
 1. Add a small tool registry in code.
 2. Include two tools:
    - `current_time`: returns current local date/time.
-   - `add_numbers`: adds two numbers from a prompt like `add 12 and 30`.
+   - `add_numbers`: adds two numbers from a prompt like `add 12 and 30` (also supports decimals).
 3. Add short descriptions so tool purpose is clear.
 
 ---
