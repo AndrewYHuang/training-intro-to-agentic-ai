@@ -69,5 +69,6 @@
 ```bash
 npm install
 cp .env.example .env
+# Edit .env and set your real ANTHROPIC_API_KEY
 npm run dev
 ```
