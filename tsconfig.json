@@ -3,5 +3,7 @@
      "noEmit": true,
      "target": "esnext",
      "module": "nodenext",
+     "moduleResolution": "nodenext",
+     "types": ["node"]
   }
 }
