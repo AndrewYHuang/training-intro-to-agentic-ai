@@ -30,8 +30,7 @@ program
     });
 
     const output = response.content
-      .filter((block) => block.type === 'text')
-      .map((block) => block.text)
+      .flatMap((block) => (block.type === 'text' ? [block.text] : []))
       .join('\n\n')
       .trim();
 
