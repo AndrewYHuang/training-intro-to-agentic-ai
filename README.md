@@ -10,13 +10,13 @@
 
 ### Milestone 1: CLI scaffold (8 min)
 1. Open `src/index.ts`.
-2. Create a runnable CLI entrypoint.
-3. Add an input loop that accepts user messages.
+2. Use the provided starter scaffold (CLI command setup + input loop) so learners do not start from scratch.
+3. Confirm you can identify where tool-selection and tool-execution logic is implemented.
 4. Confirm it works with:
    ```bash
    npm run dev
    ```
-5. Type a message and verify you get a placeholder assistant response.
+5. Type a message and verify you get an assistant response.
 
 ---
 
@@ -52,6 +52,10 @@
 1. Run the app and demo one full conversation.
 2. Show at least one successful tool call.
 3. Recap what was built and what can be extended next (more tools, real LLM API, conversation memory).
+4. Optional extension: add a `web_search` tool using a curl-able endpoint such as DuckDuckGo Instant Answer API:
+   ```bash
+   curl "https://api.duckduckgo.com/?q=agentic+ai&format=json"
+   ```
 
 ---
 
