@@ -118,12 +118,29 @@ async function getAssistantResponse(
         continue;
       }
       if (!isToolName(contentBlock.name)) {
+        toolResults.push({
+          type: "tool_result",
+          tool_use_id: contentBlock.id,
+          content: `Tool "${contentBlock.name}" is not registered.`,
+        });
+        continue;
+      }
+      if (
+        contentBlock.input === null ||
+        typeof contentBlock.input !== "object" ||
+        Array.isArray(contentBlock.input)
+      ) {
+        toolResults.push({
+          type: "tool_result",
+          tool_use_id: contentBlock.id,
+          content: "Invalid tool arguments. Expected a JSON object.",
+        });
         continue;
       }
 
       const toolResult = await runTool({
         name: contentBlock.name,
-        args: (contentBlock.input as Record<string, unknown>) ?? {},
+        args: contentBlock.input as Record<string, unknown>,
       });
 
       toolResults.push({
