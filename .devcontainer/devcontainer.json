@@ -1,0 +1,7 @@
+{
+  "name": "intro-to-agentic-ai-devcontainer",
+  "features": {
+    "ghcr.io/devcontainers/features/node:2": {}
+  },
+  "postCreateCommand": "npm install"
+}
