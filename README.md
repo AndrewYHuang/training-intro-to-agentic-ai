@@ -54,7 +54,7 @@
 3. Recap what was built and what can be extended next (more tools, real LLM API, conversation memory).
 4. Optional extension: add a `web_search` tool using a curl-able endpoint such as DuckDuckGo Instant Answer API:
    ```bash
-   curl "https://api.duckduckgo.com/?q=agentic+ai&format=json"
+   curl "https://api.duckduckgo.com/?q=github+copilot&format=json"
    ```
 
 ---
