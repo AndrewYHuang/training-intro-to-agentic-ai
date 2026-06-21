@@ -93,6 +93,10 @@ async function runTool(toolCall: ToolCall): Promise<string> {
   return tool.run(toolCall.args);
 }
 
+function isToolName(value: string): value is ToolName {
+  return value in tools;
+}
+
 async function getAssistantResponse(
   anthropic: Anthropic,
   messages: Anthropic.Messages.MessageParam[],
@@ -111,9 +115,12 @@ async function getAssistantResponse(
       if (contentBlock.type !== "tool_use") {
         continue;
       }
+      if (!isToolName(contentBlock.name)) {
+        continue;
+      }
 
       const toolResult = await runTool({
-        name: contentBlock.name as ToolName,
+        name: contentBlock.name,
         args: (contentBlock.input as Record<string, unknown>) ?? {},
       });
 
