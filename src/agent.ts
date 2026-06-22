@@ -1,92 +1,32 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { getToolDefinitions, isToolName, runTool } from "./tools.js";
-
-export type AgentState = {
-  anthropic: Anthropic;
-  messages: Anthropic.Messages.MessageParam[];
-};
-
-export function createAgent(apiKey: string): AgentState {
-  return {
-    anthropic: new Anthropic({ apiKey }),
-    messages: [],
-  };
-}
+import { getToolDefinitions, handleToolUseCall } from "./tools.js";
 
 export async function runAgentTurn(
-  agent: AgentState,
+  agent: Anthropic,
+  messages: Anthropic.Messages.MessageParam[],
   userInput: string,
 ): Promise<string> {
-  agent.messages.push({ role: "user", content: userInput });
-  return getAssistantResponse(agent);
+  messages.push({ role: "user", content: userInput });
+  return getAssistantResponse(agent, messages);
 }
 
-async function getAssistantResponse(agent: AgentState): Promise<string> {
-  let response = await agent.anthropic.messages.create({
+async function getAssistantResponse(
+  agent: Anthropic,
+  messages: Anthropic.Messages.MessageParam[],
+): Promise<string> {
+  let response = await agent.messages.create({
     model: "claude-haiku-4-5",
     max_tokens: 1024,
     tools: getToolDefinitions(),
-    messages: agent.messages,
+    messages: messages,
   });
 
   while (response.stop_reason === "tool_use") {
-    const toolResults: Anthropic.Messages.ToolResultBlockParam[] = [];
-
-    for (const contentBlock of response.content) {
-      if (contentBlock.type !== "tool_use") {
-        continue;
-      }
-      if (!isToolName(contentBlock.name)) {
-        toolResults.push({
-          type: "tool_result",
-          tool_use_id: contentBlock.id,
-          content: `Tool "${contentBlock.name}" is not registered.`,
-        });
-        continue;
-      }
-      if (
-        contentBlock.input === null ||
-        typeof contentBlock.input !== "object" ||
-        Array.isArray(contentBlock.input)
-      ) {
-        toolResults.push({
-          type: "tool_result",
-          tool_use_id: contentBlock.id,
-          content: "Invalid tool arguments. Expected a JSON object.",
-        });
-        continue;
-      }
-
-      const toolResult = await runTool(
-        contentBlock.name,
-        contentBlock.input as Record<string, unknown>,
-      );
-
-      toolResults.push({
-        type: "tool_result",
-        tool_use_id: contentBlock.id,
-        content: toolResult,
-      });
-    }
-
-    agent.messages.push({
-      role: "assistant",
-      content: response.content,
-    });
-    agent.messages.push({
-      role: "user",
-      content: toolResults,
-    });
-
-    response = await agent.anthropic.messages.create({
-      model: "claude-sonnet-4-5",
-      max_tokens: 1024,
-      tools: getToolDefinitions(),
-      messages: agent.messages,
-    });
+    console.log(response.content);
+    handleToolUseCall(agent, messages, response);
   }
 
-  agent.messages.push({
+  messages.push({
     role: "assistant",
     content: response.content,
   });
