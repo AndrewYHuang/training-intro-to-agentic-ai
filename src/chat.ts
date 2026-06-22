@@ -8,24 +8,22 @@ export async function startChat() {
   if (!apiKey) {
     throw new Error("Missing ANTHROPIC_API_KEY environment variable.");
   }
-  const model = process.env.ANTHROPIC_MODEL ?? "claude-haiku-4-5";
+  const model = process.env.ANTHROPIC_MODEL ?? "claude-sonnett-4-6";
 
   const agent = new Anthropic({ apiKey });
   const messages = [] as Anthropic.Messages.MessageParam[];
   const rl = createInterface({ input, output });
 
   console.log("CLI Agent (Claude Messages API tool use)");
-  console.log('Type "exit" to quit.');
+  console.log('Type "/exit" to quit.');
   console.log('Try: "What time is it?" or "Search the web for github copilot"');
 
   while (true) {
     const userInput = (await rl.question("> ")).trim();
-    if (userInput.toLowerCase() === "exit") {
+    if (userInput.toLowerCase() === "/exit") {
       break;
     }
-    const finalReply = await runAgentTurn(agent, messages, userInput, model);
-
-    console.log(`${finalReply}`);
+    await runAgentTurn(agent, messages, userInput, model);
   }
 
   rl.close();

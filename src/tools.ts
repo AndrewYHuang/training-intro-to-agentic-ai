@@ -1,6 +1,5 @@
 import type { Tool } from "@anthropic-ai/sdk/resources/messages/messages";
 import { currentTimeTool } from "./tools/current-time.js";
-import { webSearchTool } from "./tools/web-search.js";
 import Anthropic from "@anthropic-ai/sdk";
 
 export type LocalTool = {
@@ -10,7 +9,7 @@ export type LocalTool = {
 
 const tools = {
   current_time: currentTimeTool,
-  web_search: webSearchTool,
+  // web_search: webSearchTool,
 } as const satisfies Record<string, LocalTool>;
 
 export type ToolName = keyof typeof tools;

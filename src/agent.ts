@@ -23,11 +23,17 @@ async function getAssistantResponse(
       .stream({
         model,
         max_tokens: 1024,
-        tools: getToolDefinitions(),
+        tools: [
+          { type: "web_search_20260209", name: "web_search" },
+          ...getToolDefinitions(),
+        ],
         messages,
       })
+      .on("thinking", (text) => {
+        process.stdout.write(text);
+      })
       .on("text", (text) => {
-        console.log(text);
+        process.stdout.write(text);
       });
     response = await stream.finalMessage();
 
