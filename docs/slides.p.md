@@ -146,6 +146,16 @@ What if we gave an LLM the ability to interact with _things_? (and trained it to
 
 # (Exercise) Making your own AI Agent
 
+1. Codebase Walkthrough
+2. Messages and persistence
+3.
+
+---
+
+# (Exercise) Making your own AI Agent
+
+# Codebase Walkthrough
+
 ---
 
 # Recap
