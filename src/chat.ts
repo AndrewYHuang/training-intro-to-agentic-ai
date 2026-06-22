@@ -1,7 +1,6 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
-import { getAssistantResponse } from "./tools.js";
+import { createAgent, runAgentTurn } from "./agent.js";
 
 export async function startChat() {
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -9,9 +8,8 @@ export async function startChat() {
     throw new Error("Missing ANTHROPIC_API_KEY environment variable.");
   }
 
-  const anthropic = new Anthropic({ apiKey });
+  const agent = createAgent(apiKey);
   const rl = createInterface({ input, output });
-  const messages: Anthropic.Messages.MessageParam[] = [];
 
   console.log("CLI Agent (Claude Messages API tool use)");
   console.log('Type "exit" to quit.');
@@ -23,8 +21,7 @@ export async function startChat() {
       break;
     }
 
-    messages.push({ role: "user", content: userInput });
-    const finalReply = await getAssistantResponse(anthropic, messages);
+    const finalReply = await runAgentTurn(agent, userInput);
     console.log(`assistant> ${finalReply}`);
   }
 
