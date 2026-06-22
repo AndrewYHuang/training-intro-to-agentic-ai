@@ -70,5 +70,6 @@
 npm install
 cp .env.example .env
 # Edit .env and set your real ANTHROPIC_API_KEY
+# Optional: set ANTHROPIC_MODEL (defaults to claude-haiku-4-5)
 npm run dev
 ```

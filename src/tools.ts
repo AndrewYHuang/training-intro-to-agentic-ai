@@ -30,11 +30,9 @@ export async function runTool(
   return tools[toolName].run(args);
 }
 
-export async function handleToolUseCall(
-  agent: Anthropic,
-  messages: Anthropic.Messages.MessageParam[],
+export async function buildToolResults(
   response: Anthropic.Messages.Message,
-) {
+): Promise<Anthropic.Messages.ToolResultBlockParam[]> {
   const toolResults: Anthropic.Messages.ToolResultBlockParam[] = [];
 
   for (const contentBlock of response.content) {
@@ -74,19 +72,5 @@ export async function handleToolUseCall(
     });
   }
 
-  messages.push({
-    role: "assistant",
-    content: response.content,
-  });
-  messages.push({
-    role: "user",
-    content: toolResults,
-  });
-
-  return await agent.messages.create({
-    model: "claude-haiku-4-5",
-    max_tokens: 1024,
-    tools: getToolDefinitions(),
-    messages,
-  });
+  return toolResults;
 }
