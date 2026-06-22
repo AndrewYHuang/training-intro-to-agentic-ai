@@ -1,4 +1,4 @@
-import type { CustomTool } from "../tools.js";
+import type { CustomTool } from "../customTool.js";
 
 export const currentTimeTool: CustomTool = {
   definition: {

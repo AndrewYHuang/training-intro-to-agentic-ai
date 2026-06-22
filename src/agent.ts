@@ -1,12 +1,12 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { invokeTool, getToolDefinitions } from "./tools.js";
+import { invokeTool, getToolDefinitions } from "./customTool.js";
 
 export async function runAgentTurn(
   agent: Anthropic,
-  messages: Anthropic.Messages.MessageParam[],
+  messages: Anthropic.MessageParam[],
   model: string,
-): Promise<string> {
-  let response: Anthropic.Messages.Message;
+) {
+  let response: Anthropic.Message;
 
   do {
     const stream = agent.messages
@@ -18,6 +18,11 @@ export async function runAgentTurn(
           ...getToolDefinitions(),
         ],
         messages,
+      })
+      .on("contentBlock", (contentBlock) => {
+        if (contentBlock.type === "server_tool_use") {
+          console.log(`Server tool use: ${contentBlock.name}`)
+        }
       })
       .on("text", (text) => {
         process.stdout.write(text);
@@ -38,12 +43,4 @@ export async function runAgentTurn(
       });
     }
   } while (response.stop_reason === "tool_use");
-
-  return (
-    response.content
-      .filter((contentBlock) => contentBlock.type === "text")
-      .map((contentBlock) => contentBlock.text)
-      .join("\n")
-      .trim() || "(No text response)"
-  );
 }

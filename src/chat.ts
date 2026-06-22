@@ -8,12 +8,12 @@ export async function startChat() {
   const { apiKey, model } = getAnthropicConfig();
 
   const agent = new Anthropic({ apiKey });
-  const messages = [] as Anthropic.Messages.MessageParam[];
+  const messages = [] as Anthropic.MessageParam[];
   const rl = createInterface({ input, output });
 
   console.log("CLI Agent (Claude Messages API tool use)");
   console.log('Type "/exit" to quit.');
-  console.log('Try: "What time is it?" or "Search the web for github copilot"');
+  console.log('Try: "What time is it?" or "Search the web for the news today"');
 
   while (true) {
     const userInput = (await rl.question("> ")).trim();
@@ -21,8 +21,10 @@ export async function startChat() {
       break;
     }
     messages.push({ role: "user", content: userInput });
+
+    console.log()
     await runAgentTurn(agent, messages, model);
-    console.log("\n");
+    console.log("\n")
   }
 
   rl.close();
