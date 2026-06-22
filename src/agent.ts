@@ -19,12 +19,17 @@ async function getAssistantResponse(
   let response: Anthropic.Messages.Message;
 
   do {
-    response = await agent.messages.create({
-      model,
-      max_tokens: 1024,
-      tools: getToolDefinitions(),
-      messages,
-    });
+    const stream = agent.messages
+      .stream({
+        model,
+        max_tokens: 1024,
+        tools: getToolDefinitions(),
+        messages,
+      })
+      .on("text", (text) => {
+        console.log(text);
+      });
+    response = await stream.finalMessage();
 
     messages.push({
       role: "assistant",
