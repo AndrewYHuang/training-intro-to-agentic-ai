@@ -83,8 +83,8 @@ export async function handleToolUseCall(
     content: toolResults,
   });
 
-  response = await agent.messages.create({
-    model: "claude-sonnet-4-5",
+  return await agent.messages.create({
+    model: "claude-haiku-4-5",
     max_tokens: 1024,
     tools: getToolDefinitions(),
     messages,

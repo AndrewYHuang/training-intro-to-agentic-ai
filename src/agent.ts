@@ -22,8 +22,7 @@ async function getAssistantResponse(
   });
 
   while (response.stop_reason === "tool_use") {
-    console.log(response.content);
-    handleToolUseCall(agent, messages, response);
+    response = await handleToolUseCall(agent, messages, response);
   }
 
   messages.push({
