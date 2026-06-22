@@ -1,6 +1,6 @@
 import type { Tool } from "@anthropic-ai/sdk/resources/messages/messages";
-import { currentTimeTool } from "./current-time.js";
-import { webSearchTool } from "./web-search.js";
+import { currentTimeTool } from "./tools/current-time.js";
+import { webSearchTool } from "./tools/web-search.js";
 
 export type LocalTool = {
   definition: Tool;

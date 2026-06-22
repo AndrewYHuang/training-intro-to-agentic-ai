@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { getToolDefinitions, isToolName, runTool } from "./tools/index.js";
+import { getToolDefinitions, isToolName, runTool } from "./tools.js";
 
 export type AgentState = {
   anthropic: Anthropic;

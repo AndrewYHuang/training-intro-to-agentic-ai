@@ -1,4 +1,4 @@
-import type { LocalTool } from "./index.js";
+import type { LocalTool } from "../tools.js";
 
 export const currentTimeTool: LocalTool = {
   definition: {
