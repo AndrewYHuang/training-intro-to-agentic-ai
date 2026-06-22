@@ -1,7 +1,11 @@
 import type { Tool } from "@anthropic-ai/sdk/resources/messages/messages";
 import { currentTimeTool } from "./current-time.js";
 import { webSearchTool } from "./web-search.js";
-import { LocalTool } from "./types.js";
+
+export type LocalTool = {
+  definition: Tool;
+  run: (args: Record<string, unknown>) => Promise<string>;
+};
 
 const tools = {
   current_time: currentTimeTool,

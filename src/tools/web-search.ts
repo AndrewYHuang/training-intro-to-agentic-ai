@@ -1,4 +1,4 @@
-import { LocalTool } from "./types.js";
+import type { LocalTool } from "./index.js";
 
 export const webSearchTool: LocalTool = {
   definition: {
