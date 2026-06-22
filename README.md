@@ -1,1 +1,75 @@
 # training-intro-to-agentic-ai
+
+## 45-minute intro exercise: build a CLI agent with tools
+
+### Objective (2 min)
+- Build a basic interactive CLI chat agent that can use simple tools.
+- Success criteria: one end-to-end chat where the agent calls a tool and returns the result.
+
+---
+
+### Milestone 1: CLI scaffold (8 min)
+1. Open `src/index.ts`.
+2. Use the provided starter scaffold (CLI command setup + input loop) so learners do not start from scratch.
+3. Confirm you can identify where tool-selection and tool-execution logic is implemented.
+4. Confirm it works with:
+   ```bash
+   npm run dev
+   ```
+5. Type a message and verify you get an assistant response.
+
+---
+
+### Milestone 2: Basic chat integration (12 min)
+1. Keep a simple user → assistant loop.
+2. Continue until the user types `exit`.
+3. Keep this stage simple: message in, response out, repeat.
+
+---
+
+### Milestone 3: Add two basic tools (12 min)
+1. Add a small tool registry in code.
+2. Include two tools:
+   - `current_time`: returns current local date/time.
+   - `web_search`: fetches a short web result from a curl-able endpoint (DuckDuckGo Instant Answer API):
+     ```bash
+     curl "https://api.duckduckgo.com/?q=github+copilot&format=json"
+     ```
+3. Add short descriptions so tool purpose is clear.
+
+---
+
+### Milestone 4: Happy-path tool calling (8 min)
+1. Add a simple tool-selection step from user input.
+2. Implement this flow:
+   - detect tool request
+   - execute tool
+   - send tool result back into assistant response
+3. Validate with scripted prompts:
+   - `What time is it?`
+   - `Search the web for github copilot`
+
+---
+
+### Wrap-up and demo (3 min)
+1. Run the app and demo one full conversation.
+2. Show at least one successful tool call.
+3. Recap what was built and what can be extended next (more tools, real LLM API, conversation memory).
+4. Explain how the `web_search` tool can be improved next (better parsing, richer sources, retries).
+
+---
+
+### Constraints
+- Happy path only (no failure/debug scenarios).
+- Prioritize confidence and momentum.
+- Keep steps highly guided and incremental.
+
+## Quick start
+
+```bash
+npm install
+cp .env.example .env
+# Edit .env and set your real ANTHROPIC_API_KEY
+# Optional: set ANTHROPIC_MODEL (defaults to claude-haiku-4-5)
+npm run dev
+```
