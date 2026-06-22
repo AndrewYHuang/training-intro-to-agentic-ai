@@ -4,11 +4,8 @@ import { invokeTool, getToolDefinitions } from "./tools.js";
 export async function runAgentTurn(
   agent: Anthropic,
   messages: Anthropic.Messages.MessageParam[],
-  userInput: string,
   model: string,
 ): Promise<string> {
-  messages.push({ role: "user", content: userInput });
-
   let response: Anthropic.Messages.Message;
 
   do {

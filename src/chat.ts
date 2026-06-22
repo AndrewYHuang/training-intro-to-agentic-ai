@@ -20,7 +20,8 @@ export async function startChat() {
     if (userInput.toLowerCase() === "/exit") {
       break;
     }
-    await runAgentTurn(agent, messages, userInput, model);
+    messages.push({ role: "user", content: userInput });
+    await runAgentTurn(agent, messages, model);
     console.log("\n");
   }
 
