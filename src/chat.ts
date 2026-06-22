@@ -1,14 +1,11 @@
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 import { runAgentTurn } from "./agent.js";
+import { getAnthropicConfig } from "./config.js";
 import Anthropic from "@anthropic-ai/sdk";
 
 export async function startChat() {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    throw new Error("Missing ANTHROPIC_API_KEY environment variable.");
-  }
-  const model = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-6";
+  const { apiKey, model } = getAnthropicConfig();
 
   const agent = new Anthropic({ apiKey });
   const messages = [] as Anthropic.Messages.MessageParam[];
