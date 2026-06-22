@@ -1,6 +1,6 @@
-import type { LocalTool } from "../tools.js";
+import type { CustomTool } from "../tools.js";
 
-export const currentTimeTool: LocalTool = {
+export const currentTimeTool: CustomTool = {
   definition: {
     name: "current_time",
     description: "Get the current local date and time",

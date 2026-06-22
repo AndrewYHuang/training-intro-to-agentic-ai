@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { buildToolResults, getToolDefinitions } from "./tools.js";
+import { invokeTool, getToolDefinitions } from "./tools.js";
 
 export async function runAgentTurn(
   agent: Anthropic,
@@ -8,14 +8,7 @@ export async function runAgentTurn(
   model: string,
 ): Promise<string> {
   messages.push({ role: "user", content: userInput });
-  return getAssistantResponse(agent, messages, model);
-}
 
-async function getAssistantResponse(
-  agent: Anthropic,
-  messages: Anthropic.Messages.MessageParam[],
-  model: string,
-): Promise<string> {
   let response: Anthropic.Messages.Message;
 
   do {
@@ -29,12 +22,10 @@ async function getAssistantResponse(
         ],
         messages,
       })
-      .on("thinking", (text) => {
-        process.stdout.write(text);
-      })
       .on("text", (text) => {
         process.stdout.write(text);
       });
+
     response = await stream.finalMessage();
 
     messages.push({
@@ -43,7 +34,7 @@ async function getAssistantResponse(
     });
 
     if (response.stop_reason === "tool_use") {
-      const toolResults = await buildToolResults(response);
+      const toolResults = await invokeTool(response);
       messages.push({
         role: "user",
         content: toolResults,

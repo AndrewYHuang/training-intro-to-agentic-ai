@@ -8,7 +8,7 @@ export async function startChat() {
   if (!apiKey) {
     throw new Error("Missing ANTHROPIC_API_KEY environment variable.");
   }
-  const model = process.env.ANTHROPIC_MODEL ?? "claude-sonnett-4-6";
+  const model = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-6";
 
   const agent = new Anthropic({ apiKey });
   const messages = [] as Anthropic.Messages.MessageParam[];
@@ -24,6 +24,7 @@ export async function startChat() {
       break;
     }
     await runAgentTurn(agent, messages, userInput, model);
+    console.log("\n");
   }
 
   rl.close();
