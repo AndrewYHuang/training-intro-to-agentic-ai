@@ -6,46 +6,40 @@ import { stdin as input, stdout as output } from "node:process";
 
 type ToolName = "current_time" | "web_search";
 
-type ToolCall = {
-  name: ToolName;
-  args: Record<string, unknown>;
-};
+type ToolDefinition = Anthropic.Tool;
 
-type ToolDefinition = {
-  name: ToolName;
-  description: string;
-  inputSchema: {
-    type: "object";
-    properties?: unknown | null;
-    required?: string[] | null;
-    [key: string]: unknown;
-  };
+type LocalTool = {
+  definition: ToolDefinition;
   run: (args: Record<string, unknown>) => Promise<string>;
 };
 
-const tools: Record<ToolName, ToolDefinition> = {
+const tools: Record<ToolName, LocalTool> = {
   current_time: {
-    name: "current_time",
-    description: "Get the current local date and time",
-    inputSchema: {
-      type: "object",
-      properties: {},
-      required: [],
+    definition: {
+      name: "current_time",
+      description: "Get the current local date and time",
+      input_schema: {
+        type: "object",
+        properties: {},
+        required: [],
+      },
     },
     run: async () => new Date().toLocaleString(),
   },
   web_search: {
-    name: "web_search",
-    description: "Search the web and return a concise result summary",
-    inputSchema: {
-      type: "object",
-      properties: {
-        query: {
-          type: "string",
-          description: "Search query string",
+    definition: {
+      name: "web_search",
+      description: "Search the web and return a concise result summary",
+      input_schema: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "Search query string",
+          },
         },
+        required: ["query"],
       },
-      required: ["query"],
     },
     run: async (args) => {
       const query = String(args.query ?? "").trim();
@@ -84,16 +78,15 @@ const tools: Record<ToolName, ToolDefinition> = {
   },
 };
 
-function getToolDefinitions() {
-  return Object.values(tools).map((tool) => ({
-    name: tool.name,
-    description: tool.description,
-    input_schema: tool.inputSchema,
-  }));
+function getToolDefinitions(): ToolDefinition[] {
+  return Object.values(tools).map((tool) => tool.definition);
 }
 
-async function runTool(toolCall: ToolCall): Promise<string> {
-  return tools[toolCall.name].run(toolCall.args);
+async function runTool(
+  toolName: ToolName,
+  args: Record<string, unknown>,
+): Promise<string> {
+  return tools[toolName].run(args);
 }
 
 function isToolName(value: string): value is ToolName {
@@ -139,10 +132,10 @@ async function getAssistantResponse(
         continue;
       }
 
-      const toolResult = await runTool({
-        name: contentBlock.name,
-        args: contentBlock.input as Record<string, unknown>,
-      });
+      const toolResult = await runTool(
+        contentBlock.name,
+        contentBlock.input as Record<string, unknown>,
+      );
 
       toolResults.push({
         type: "tool_result",
