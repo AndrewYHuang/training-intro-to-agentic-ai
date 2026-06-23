@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { invokeTool, customToolDefinitions } from "./tools.js";
+import { handleToolUse, customToolDefinitions } from "./tools.js";
 
 export async function runAgentTurn(
   agent: Anthropic,
@@ -8,12 +8,11 @@ export async function runAgentTurn(
 ) {
   let response: Anthropic.Message;
 
-  // do {
   const stream = agent.messages
     .stream({
       model,
       max_tokens: 1024,
-      // tools: customToolDefinitions,
+      tools: [],
       system: undefined, // TODO Add a system prompt
       messages,
     })
@@ -28,13 +27,11 @@ export async function runAgentTurn(
     content: response.content,
   });
 
-  // if (response.stop_reason === "tool_use") {
-  //   const toolResults = await invokeTool(response);
-  //   messages.push({
-  //     role: "user",
-  //     content: toolResults,
-  //   });
-  // }
-
-  // } while (response.stop_reason === "tool_use");
+  if (response.stop_reason === "TODO") {
+    const toolResults = await handleToolUse(response);
+    messages.push({
+      role: "user",
+      content: toolResults,
+    });
+  }
 }

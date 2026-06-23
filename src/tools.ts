@@ -14,7 +14,7 @@ const customTools: Record<string, ToolFunction> = {
   get_current_time: getCurrentTime,
 } as const;
 
-export async function invokeTool(
+export async function handleToolUse(
   response: Anthropic.Message,
 ): Promise<Anthropic.ToolResultBlockParam[]> {
   const toolResults: Anthropic.ToolResultBlockParam[] = [];

@@ -79,6 +79,7 @@ What if we gave an LLM the ability to interact with _things_? (and trained it to
 
 - Long term memory
 - System / skill prompts
+- Reasoning and chain-of-thought
 
 <!-- pause -->
 
@@ -173,3 +174,11 @@ Agents - Augmented LLMs running in a loop
 - Claude API to call LLM
 - Augmented with scaffolding
 - Basic tool use
+
+---
+
+# Recap
+
+---
+
+# Further reading

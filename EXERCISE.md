@@ -10,13 +10,11 @@ Please follow the set-up instructions in the [README](./README.md) to get the pr
 
 ## Project overview
 
-### Structure
+`src/app.ts` - The main entry-point of the application. This immediately starts the chat loop. The user and agent take "turns", which is the motivation behind the name of the function `runAgentTurn`, defined in `agent.ts`.
 
-`src/app.ts` - The main entry-point of the application. This immediately starts the chat loop.
+`src/agent.ts` - This is where the agent loop is implemented. The agent loop is responsible for sending user input to the LLM (in the form of `messages`), and handling the LLM's responses.
 
-`src/agent.ts` - This is where the agent loop is implemented. The agent loop is responsible for sending user input to the LLM, and handling the LLM's response to tool calls.
-
-`src/tools.ts` - This is where all the tools are listed and where messages for tool use are handled
+`src/tools.ts` - This is where all the tools are listed and where tool use is handled.
 
 `src/tools/` - This folder is where we define all our tools and implement their functionality. Each tool is defined in its own file.
 
@@ -33,6 +31,60 @@ This is because we need to do a couple of things to make sure the LLM can use a 
 1. Tell the LLM that the tool exists and how to use it.
 2. Invoke the tool when the LLM asks for it.
 
+#### Send a list of available tools to the LLM
+
+The list of available tools is defined in `tools.ts` as `customToolDefinitions`. It's formatted in the right way for the LLM to understand, but we need to make sure that the LLM is aware of it.
+
+The `messages.stream` API call is where the LLM is called, and it takes a `tools` property that can be used to send a list of available tools to the LLM.
+
+<details>
+
+<summary>Hint</summary>
+
+We need to pass `customToolDefinitions` to the `tools` property of the `messages.stream` call in `agent.ts`. The code should look like this:
+
+```typescript
+const stream = agent.messages.stream({
+  model,
+  max_tokens: 1024,
+  tools: customToolDefinitions,
+  system: undefined, // TODO Add a system prompt
+  messages,
+});
+```
+
+</details>
+
+#### Invoke tools when the LLM requests them
+
+When the LLM wants to use a tool, it will tell us by returning a response with `stop_reason = "tool_use"`. We need to check for this type of message and handle it.
+
+We already have function called `handleToolUse` in `tools.ts` that takes care of this for us. We just need to call it when we see a message with `stop_reason: "tool_use"`.
+
+<details>
+
+<summary>Hint</summary>
+
+```typescript
+if (response.stop_reason === "tool_use") {
+  const toolResults = await handleToolUse(response);
+  messages.push({
+    role: "user",
+    content: toolResults,
+  });
+}
+```
+
+</details>
+
+There are [many more values](https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons) that the `stop_reason` field can take, but for this exercise we only need to handle `tool_use` and `end_turn`.
+
+### Get available ingredients
+
+The kitchen inventory is stored as an object in `src/tools/get-kitchen-inventory.ts`. The LLM should be able to ask for a list of available ingredients, and the tool should return them.
+
+Add `get_kitchen_inventory` to the tool list, and return the list of ingredients when the LLM calls it.
+
 ### Add recipe search
 
 RecipeAPI.io is a free API that allows you to search for recipes based on ingredients. You will need to implement a way for the LLM to call this API and retrieve recipes based on the user's input.
@@ -41,7 +93,57 @@ Inside `src/tools/`
 
 ### Set up the agent loop
 
-While stop reason is not end_turn
+This is where our tool becomes truly _agentic_.
+
+The agent can use a tool once per turn, but it can't chain tool calls together. For example, if the user asks for a recipe based on the available ingredients in our kitchen, the agent can call the recipe search tool _or_ the list ingredients tool, but not both, one after the other.
+
+The correct way to handle this is to have the scaffold loop back to the LLM after each tool call.
+
+Wrap the body of the `runAgentTurn` function in a loop that handles the `stop_reason` correctly. Assume that `stop_reason` will only either be `tool_use` or `end_turn`.
+
+<details>
+<summary>Hint</summary>
+
+```typescript
+export async function runAgentTurn(
+  agent: Anthropic,
+  messages: Anthropic.MessageParam[],
+  model: string,
+) {
+  let response: Anthropic.Message;
+
+  do {
+    const stream = agent.messages
+      .stream({
+        model,
+        max_tokens: 1024,
+        tools: customToolDefinitions,
+        system: undefined, // TODO Add a system prompt
+        messages,
+      })
+      .on("text", (text) => {
+        process.stdout.write(text);
+      });
+
+    response = await stream.finalMessage();
+
+    messages.push({
+      role: "assistant",
+      content: response.content,
+    });
+
+    if (response.stop_reason === "tool_use") {
+      const toolResults = await handleToolUse(response);
+      messages.push({
+        role: "user",
+        content: toolResults,
+      });
+    }
+  } while (response.stop_reason === "tool_use");
+}
+```
+
+</details>
 
 ## Optional Tasks
 
@@ -54,3 +156,7 @@ The application defaults to `claude-haiku-4-5`, but you can try `claude-sonnet-4
 ### Calculator
 
 ### Persist memory to disk
+
+```
+
+```
