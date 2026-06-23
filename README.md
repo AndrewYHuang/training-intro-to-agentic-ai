@@ -1,75 +1,37 @@
-# training-intro-to-agentic-ai
+# Intro to Agentic AI
 
-## 45-minute intro exercise: build a CLI agent with tools
+## Overview
 
-### Objective (2 min)
-- Build a basic interactive CLI chat agent that can use simple tools.
-- Success criteria: one end-to-end chat where the agent calls a tool and returns the result.
+This is an introductory lesson to Agentic AI.
 
----
+The [presentation](./docs/slides.p.md) covers the main theory behind how Agentic AI works.
 
-### Milestone 1: CLI scaffold (8 min)
-1. Open `src/index.ts`.
-2. Use the provided starter scaffold (CLI command setup + input loop) so learners do not start from scratch.
-3. Confirm you can identify where tool-selection and tool-execution logic is implemented.
-4. Confirm it works with:
-   ```bash
-   npm run dev
-   ```
-5. Type a message and verify you get an assistant response.
+The [exercise](./EXERCISE.md) will lead you through augmenting an LLM-powered chat with tool use.
 
----
+## Set-up and Prerequisites
 
-### Milestone 2: Basic chat integration (12 min)
-1. Keep a simple user → assistant loop.
-2. Continue until the user types `exit`.
-3. Keep this stage simple: message in, response out, repeat.
+### Dependencies
 
----
+You will need:
 
-### Milestone 3: Add two basic tools (12 min)
-1. Add a small tool registry in code.
-2. Include two tools:
-   - `current_time`: returns current local date/time.
-   - `web_search`: fetches a short web result from a curl-able endpoint (DuckDuckGo Instant Answer API):
-     ```bash
-     curl "https://api.duckduckgo.com/?q=github+copilot&format=json"
-     ```
-3. Add short descriptions so tool purpose is clear.
+- A clone of this repo
+- Node.js (and npm)
+- An Anthropic API key
+- A recipeapi.io API key (for an exercise task)
 
----
+### Quick start
 
-### Milestone 4: Happy-path tool calling (8 min)
-1. Add a simple tool-selection step from user input.
-2. Implement this flow:
-   - detect tool request
-   - execute tool
-   - send tool result back into assistant response
-3. Validate with scripted prompts:
-   - `What time is it?`
-   - `Search the web for github copilot`
-
----
-
-### Wrap-up and demo (3 min)
-1. Run the app and demo one full conversation.
-2. Show at least one successful tool call.
-3. Recap what was built and what can be extended next (more tools, real LLM API, conversation memory).
-4. Explain how the `web_search` tool can be improved next (better parsing, richer sources, retries).
-
----
-
-### Constraints
-- Happy path only (no failure/debug scenarios).
-- Prioritize confidence and momentum.
-- Keep steps highly guided and incremental.
-
-## Quick start
+Set up the project and environment variables:
 
 ```bash
 npm install
 cp .env.example .env
-# Edit .env and set your real ANTHROPIC_API_KEY
+# Edit .env and set your real ANTHROPIC_API_KEY and RECIPEAPI_API_KEY
 # Optional: set ANTHROPIC_MODEL (defaults to claude-haiku-4-5)
+```
+
+Run the CLI:
+
+```bash
 npm run dev
 ```

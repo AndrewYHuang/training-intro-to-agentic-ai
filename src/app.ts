@@ -1,20 +1,37 @@
+import { createInterface } from "node:readline/promises";
+import { stdin as input, stdout as output } from "node:process";
+import { runAgentTurn } from "./agent.js";
+import { getAnthropicConfig } from "./config.js";
+import Anthropic from "@anthropic-ai/sdk";
 import "dotenv/config";
-import { Command } from "commander";
-import { startChat } from "./chat.js";
 
-const program = new Command();
-program
-  .name("agent-chat")
-  .description("Interactive CLI agent chat tool with basic tool use")
-  .action(async () => {
-    await startChat();
-  });
+async function startChat() {
+  const { apiKey, model } = getAnthropicConfig();
 
-async function main() {
-  await program.parseAsync(process.argv);
+  const agent = new Anthropic({ apiKey });
+
+  const messageHistory: Anthropic.MessageParam[] = [];
+  const rl = createInterface({ input, output });
+
+  console.log("Welcome to RecipeMate");
+  console.log('Type "/exit" to quit.');
+  console.log('Try: "What time is it?" or "Give me a recipe for wonton soup"');
+
+  while (true) {
+    const userInput = (await rl.question("> ")).trim();
+    if (userInput.toLowerCase() === "/exit") {
+      break;
+    }
+
+    messageHistory.push({ role: "user", content: userInput });
+
+    console.log();
+    await runAgentTurn(agent, messageHistory, model);
+    console.log("\n");
+  }
+
+  rl.close();
+  console.log("Bye!");
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+await startChat();
