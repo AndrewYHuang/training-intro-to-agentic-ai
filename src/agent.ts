@@ -12,7 +12,7 @@ export async function runAgentTurn(
     .stream({
       model,
       max_tokens: 1024,
-      tools: customToolDefinitions,
+      tools: [],
       system: undefined, // TODO Add a system prompt
       messages,
     })
@@ -27,7 +27,7 @@ export async function runAgentTurn(
     content: response.content,
   });
 
-  if (response.stop_reason === "tool_use") {
+  if (response.stop_reason === "TODO") {
     const toolResults = await handleToolUse(response);
     messages.push({
       role: "user",

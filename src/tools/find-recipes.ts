@@ -140,7 +140,7 @@ export async function findRecipes(args: Record<string, unknown>) {
   };
 
   const params = new URLSearchParams({
-    per_page: String(maxResults ?? 5),
+    per_page: String(maxResults),
   });
 
   if (search) {
