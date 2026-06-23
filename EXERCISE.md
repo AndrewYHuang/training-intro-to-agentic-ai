@@ -85,12 +85,6 @@ The kitchen inventory is stored as an object in `src/tools/get-kitchen-inventory
 
 Add `get_kitchen_inventory` to the tool list, and return the list of ingredients when the LLM calls it.
 
-### Add recipe search
-
-RecipeAPI.io is a free API that allows you to search for recipes based on ingredients. You will need to implement a way for the LLM to call this API and retrieve recipes based on the user's input.
-
-Inside `src/tools/`
-
 ### Set up the agent loop
 
 This is where our tool becomes truly _agentic_.
@@ -145,18 +139,28 @@ export async function runAgentTurn(
 
 </details>
 
-## Optional Tasks
+## Extension Tasks
 
-### Try a different model
+### Add recipe search
+
+RecipeAPI.io is a free API that allows you to search for recipes based on ingredients. You will need to implement a way for the LLM to call this API and retrieve recipes based on the user's input.
+
+Inside `src/tools/`
+
+### More suggestions
+
+#### Try a different model
 
 The application defaults to `claude-haiku-4-5`, but you can try `claude-sonnet-4-6` or a different model. Set the `ANTHROPIC_MODEL` environment variable to the model you want to use.
 
-### Add a system prompt
+#### Add a system prompt
 
-### Calculator
+Sometimes, a system prompt can help the LLM understand the context of the conversation better. You can add a system prompt to the `messages.stream` call in `agent.ts`.
 
-### Persist memory to disk
+#### Calculator
 
-```
+A calculator tool could be useful for scaling recipes or converting units. You can implement a simple calculator tool that takes a mathematical expression as input and returns the result.
 
-```
+#### Persist memory to disk
+
+It might be useful to persist the conversation history to disk so that the agent can remember past interactions. You can implement a simple file-based memory system that saves and loads messages from a JSON file.
