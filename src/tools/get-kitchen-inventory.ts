@@ -47,6 +47,6 @@ export const getKitchenInventoryToolDefinition: Anthropic.Tool = {
   },
 };
 
-export async function get_kitchen_inventory() {
-  return "";
+export async function getKitchenInventory() {
+  return JSON.stringify(kitchenInventory.items, null, 2);
 }

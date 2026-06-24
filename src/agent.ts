@@ -8,30 +8,32 @@ export async function runAgentTurn(
 ) {
   let response: Anthropic.Message;
 
-  const stream = agent.messages
-    .stream({
-      model,
-      max_tokens: 1024,
-      tools: [],
-      system: undefined, // TODO Add a system prompt
-      messages,
-    })
-    .on("text", (text) => {
-      process.stdout.write(text);
-    });
+  do {
+    const stream = agent.messages
+      .stream({
+        model,
+        max_tokens: 1024,
+        tools: customToolDefinitions,
+        system: undefined, // TODO Add a system prompt
+        messages,
+      })
+      .on("text", (text) => {
+        process.stdout.write(text);
+      });
 
-  response = await stream.finalMessage();
+    response = await stream.finalMessage();
 
-  messages.push({
-    role: "assistant",
-    content: response.content,
-  });
-
-  if (response.stop_reason === "TODO") {
-    const toolResults = await handleToolUse(response);
     messages.push({
-      role: "user",
-      content: toolResults,
+      role: "assistant",
+      content: response.content,
     });
-  }
+
+    if (response.stop_reason === "tool_use") {
+      const toolResults = await handleToolUse(response);
+      messages.push({
+        role: "user",
+        content: toolResults,
+      });
+    }
+  } while (response.stop_reason === "tool_use");
 }

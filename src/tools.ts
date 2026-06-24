@@ -7,17 +7,26 @@ import {
   getCurrentTime,
   getCurrentTimeToolDefinition,
 } from "./tools/get-current-time.js";
+import {
+  getKitchenInventory,
+  getKitchenInventoryToolDefinition,
+} from "./tools/get-kitchen-inventory.js";
+import { getRecipe, getRecipeToolDefinition } from "./tools/get-recipe.js";
 
 export type ToolFunction = (args: Record<string, unknown>) => Promise<string>;
 
 export const customToolDefinitions: Anthropic.Tool[] = [
   getCurrentTimeToolDefinition,
+  getKitchenInventoryToolDefinition,
   findRecipesToolDefinition,
+  getRecipeToolDefinition,
 ] as const;
 
 const customTools: Record<string, ToolFunction> = {
   get_current_time: getCurrentTime,
+  get_kitchen_inventory: getKitchenInventory,
   find_recipes: findRecipes,
+  get_recipe: getRecipe,
 } as const;
 
 export async function handleToolUse(
