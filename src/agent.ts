@@ -20,6 +20,8 @@ export async function runAgentTurn(
       process.stdout.write(text);
     });
 
+  console.log("\n");
+
   response = await stream.finalMessage();
 
   messages.push({
