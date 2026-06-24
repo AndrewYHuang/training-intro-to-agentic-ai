@@ -12,6 +12,7 @@ type FindRecipesArgs = {
 };
 
 type RecipeAPIRecipe = {
+  id: number;
   name: string;
   description?: string;
   cuisine?: string;
@@ -101,6 +102,7 @@ function getMaxResults(value: unknown) {
 function formatRecipes(recipes: RecipeAPIRecipe[]) {
   return JSON.stringify(
     recipes.map((recipe) => ({
+      id: recipe.id,
       name: recipe.name,
       description: recipe.description,
       cuisine: recipe.cuisine,
