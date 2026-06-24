@@ -18,11 +18,17 @@ Please follow the set-up instructions in the [README](./README.md) to get the pr
 
 `src/tools/` - This folder is where we define all our tools and implement their functionality. Each tool is defined in its own file.
 
+`src/tools/find-recipes.ts` - This is a fully implemented tool that allows the LLM to search for recipes based on a list of ingredients. It uses the RecipeAPI.io API to find recipes.
+
+`src/tools/get-current-time.ts` - This is also fully implemented. It gets the current time.
+
+`src/tools/get-kitchen-inventory.ts` - This is incomplete - to be completed as part of the tasks below
+
 ## Tasks
 
 ### Handle tool use
 
-For some strange reason, the previous developer included a tool to get the current time. Luckily for us, this is useful to check if the LLM is able to use tools.
+For some strange reason, the previous developer included a tool to get the current time (in addition to finding recipes). Luckily for us, this is useful to check if the LLM is able to use tools.
 
 You may have noticed that if you ask the AI for the time, it says that it's unable to tell us.
 
@@ -139,13 +145,15 @@ export async function runAgentTurn(
 
 </details>
 
+### Get recipe by id
+
+RecipeAPI.io is a free API that allows you to search and retrieve recipes. The previous developer has already implemented a tool that allows the LLM to search for recipes, however, the LLM is unable to retrieve the recipe once it has been found.
+
+Add a way to retrieve a recipe by its id to `get-recipe.ts`, and add it as a tool that the agent can use.
+
+The RecipeAPI.io API has an endpoint for this: `GET /api/v1/recipes/{id}`. You can find the documentation [here](https://recipeapi.io/docs/resources/recipes/#get-recipe).
+
 ## Extension Tasks
-
-### Add recipe search
-
-RecipeAPI.io is a free API that allows you to search for recipes based on ingredients. You will need to implement a way for the LLM to call this API and retrieve recipes based on the user's input.
-
-Inside `src/tools/`
 
 ### More suggestions
 
