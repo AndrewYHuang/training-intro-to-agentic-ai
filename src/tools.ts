@@ -1,5 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
 import {
+  findRecipes,
+  findRecipesToolDefinition,
+} from "./tools/find-recipes.js";
+import {
   getCurrentTime,
   getCurrentTimeToolDefinition,
 } from "./tools/get-current-time.js";
@@ -8,10 +12,12 @@ export type ToolFunction = (args: Record<string, unknown>) => Promise<string>;
 
 export const customToolDefinitions: Anthropic.Tool[] = [
   getCurrentTimeToolDefinition,
+  findRecipesToolDefinition,
 ] as const;
 
 const customTools: Record<string, ToolFunction> = {
   get_current_time: getCurrentTime,
+  find_recipes: findRecipes,
 } as const;
 
 export async function handleToolUse(
