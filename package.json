@@ -12,7 +12,6 @@
   "license": "MIT",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.105.0",
-    "commander": "^15.0.0",
     "dotenv": "^17.4.2"
   },
   "devDependencies": {
