@@ -10,6 +10,8 @@ Please follow the set-up instructions in the [README](./README.md) to get the pr
 
 ## Project overview
 
+This project uses the [Anthropic Client SDK](https://platform.claude.com/docs/en/cli-sdks-libraries/sdks/typescript) to handle calls to the Anthropic Message API
+
 `src/app.ts` - The main entry-point of the application. This immediately starts the chat loop. The user and agent take "turns", which is the motivation behind the name of the function `runAgentTurn`, defined in `agent.ts`.
 
 `src/agent.ts` - This is where the agent loop is implemented. The agent loop is responsible for sending user input to the LLM (in the form of `messages`), and handling the LLM's responses.
@@ -172,3 +174,7 @@ A calculator tool could be useful for scaling recipes or converting units. You c
 #### Persist memory to disk
 
 It might be useful to persist the conversation history to disk so that the agent can remember past interactions. You can implement a simple file-based memory system that saves and loads messages from a JSON file.
+
+#### Try the Agent SDK
+
+The Anthropic [Agent SDK](https://code.claude.com/docs/en/agent-sdk/overview#compare-the-agent-sdk-to-other-claude-tools) simplifies this to be even easier. Try to implement the same functionality using this SDK instead of the Client SDK.
