@@ -38,6 +38,9 @@ export async function handleToolUse(
     (block) => block.type === "tool_use",
   )) {
     const { id: toolUseId, name: toolName, input: args } = toolUseBlock;
+
+    console.log("\n" + "Tool use request: \n" + JSON.stringify(toolUseBlock) + "\n")
+
     const tool = customTools[toolName];
     const toolResult = await tool(args as Record<string, unknown>);
     toolResults.push({
