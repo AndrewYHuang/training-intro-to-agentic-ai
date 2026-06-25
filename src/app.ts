@@ -27,6 +27,7 @@ async function startChat() {
 
     console.log();
     await runAgentTurn(agent, messageHistory, model);
+    console.log("\n");
   }
 
   rl.close();
