@@ -7,7 +7,8 @@ export function getAnthropicConfig() {
   }
 
   const model = process.env.ANTHROPIC_MODEL ?? DEFAULT_ANTHROPIC_MODEL;
-  return { apiKey, model };
+  const baseURL = process.env.ANTHROPIC_BASE_URL;
+  return { apiKey, model, baseURL };
 }
 
 export function getRecipeAPIConfig() {

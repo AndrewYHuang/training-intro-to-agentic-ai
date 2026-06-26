@@ -6,9 +6,9 @@ import Anthropic from "@anthropic-ai/sdk";
 import "dotenv/config";
 
 async function startChat() {
-  const { apiKey, model } = getAnthropicConfig();
+  const { apiKey, model, baseURL } = getAnthropicConfig();
 
-  const agent = new Anthropic({ apiKey });
+  const agent = new Anthropic({ apiKey, ...(baseURL ? { baseURL } : {}) });
 
   const messageHistory: Anthropic.MessageParam[] = [];
   const rl = createInterface({ input, output });
