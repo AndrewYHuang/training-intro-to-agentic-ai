@@ -8,6 +8,12 @@ The [presentation](./docs/slides.p.md) covers the main theory behind how Agentic
 
 The [exercise](./EXERCISE.md) will lead you through augmenting an LLM-powered chat with tool use.
 
+> [!NOTE]
+>
+> This repo uses the [Anthropic SDK](https://platform.claude.com/docs/en/cli-sdks-libraries/sdks/typescript) to interact with the Messages API more directly, to demonstrate the agentic flow.
+> 
+> If I were planning to implement for real, I would consider using the [Agent SDK](https://code.claude.com/docs/en/agent-sdk/overview) instead, as it handles the agentic flow so we don't have to.
+
 ## Set-up and Prerequisites
 
 ### Dependencies
