@@ -54,15 +54,7 @@ The `messages.stream` API call is where the LLM is called, and it takes a `tools
 
 We need to pass `customToolDefinitions` to the `tools` property of the `messages.stream` call in `agent.ts`. The code should look like this:
 
-```typescript
-const stream = agent.messages.stream({
-  model,
-  max_tokens: 1024,
-  tools: customToolDefinitions,
-  system: undefined, // TODO Add a system prompt
-  messages,
-});
-```
+https://github.com/AndrewYHuang/training-intro-to-agentic-ai/blob/5554339cb172f3f8f47b8e7fce5c3730b39e4d66/src/agent.ts#L12-L22
 
 </details>
 
@@ -76,15 +68,7 @@ We already have function called `handleToolUse` in `tools.ts` that takes care of
 
 <summary>Hint</summary>
 
-```typescript
-if (response.stop_reason === "tool_use") {
-  const toolResults = await handleToolUse(response);
-  messages.push({
-    role: "user",
-    content: toolResults,
-  });
-}
-```
+https://github.com/AndrewYHuang/training-intro-to-agentic-ai/blob/5554339cb172f3f8f47b8e7fce5c3730b39e4d66/src/agent.ts#L31-L37
 
 </details>
 
@@ -106,44 +90,7 @@ Wrap the body of the `runAgentTurn` function in a loop that handles the `stop_re
 <details>
 <summary>Hint</summary>
 
-```typescript
-export async function runAgentTurn(
-  agent: Anthropic,
-  messages: Anthropic.MessageParam[],
-  model: string,
-) {
-  let response: Anthropic.Message;
-
-  do {
-    const stream = agent.messages
-      .stream({
-        model,
-        max_tokens: 1024,
-        tools: customToolDefinitions,
-        system: undefined, // TODO Add a system prompt
-        messages,
-      })
-      .on("text", (text) => {
-        process.stdout.write(text);
-      });
-
-    response = await stream.finalMessage();
-
-    messages.push({
-      role: "assistant",
-      content: response.content,
-    });
-
-    if (response.stop_reason === "tool_use") {
-      const toolResults = await handleToolUse(response);
-      messages.push({
-        role: "user",
-        content: toolResults,
-      });
-    }
-  } while (response.stop_reason === "tool_use");
-}
-```
+https://github.com/AndrewYHuang/training-intro-to-agentic-ai/blob/5554339cb172f3f8f47b8e7fce5c3730b39e4d66/src/agent.ts#L11-L38
 
 </details>
 
@@ -151,7 +98,15 @@ export async function runAgentTurn(
 
 The kitchen inventory is stored as an object in `src/tools/get-kitchen-inventory.ts`. The LLM should be able to ask for a list of available ingredients, and the tool should return them.
 
-Add `get_kitchen_inventory` to the tool list, and return the list of ingredients when the LLM calls it.
+Add `get_kitchen_inventory` to the tool list, and return the list of ingredients as a string when the LLM calls it.
+
+<details>
+<summary>Hint</summary>
+  
+A solution is available here:
+https://github.com/AndrewYHuang/training-intro-to-agentic-ai/blob/solution/src/tools/get-kitchen-inventory.ts
+
+</details>
 
 ### Get recipe by id
 
@@ -160,6 +115,14 @@ RecipeAPI.io is a free API that allows you to search and retrieve recipes. The p
 Add a way to retrieve a recipe by its id to `get-recipe.ts`, and add it as a tool that the agent can use.
 
 The RecipeAPI.io API has an endpoint for this: `GET /api/v1/recipes/{id}`. You can find the documentation [here](https://recipeapi.io/docs/resources/recipes/#get-recipe).
+
+<details>
+<summary>Hint</summary>
+  
+A solution is available here:
+https://github.com/AndrewYHuang/training-intro-to-agentic-ai/blob/solution/src/tools/get-recipe.ts
+
+</details>
 
 ## Extension Tasks
 
