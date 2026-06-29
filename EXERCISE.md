@@ -32,12 +32,15 @@ This project uses the [Anthropic Client SDK](https://platform.claude.com/docs/en
 
 For some strange reason, the previous developer included a tool to get the current time (in addition to finding recipes). Luckily for us, this is useful to check if the LLM is able to use tools.
 
-You may have noticed that if you ask the AI for the time, it says that it's unable to tell us.
-
-This is because we need to do a couple of things to make sure the LLM can use a tool.
-
-1. Tell the LLM that the tool exists and how to use it.
-2. Invoke the tool when the LLM asks for it.
+> [!IMPORTANT]
+>
+> You may have noticed that if you ask the AI for the time, it says that it's unable to tell us.
+>
+> This is because we need to do a few things to make sure the LLM can use a tool.
+> 
+> 1. Tell the LLM that the tool exists and how to use it.
+> 2. Invoke the tool when the LLM asks for it.
+> 3. Respond to the result of the tool use.
 
 #### Send a list of available tools to the LLM
 
@@ -90,7 +93,7 @@ There are [many more values](https://platform.claude.com/docs/en/build-with-clau
 > [!NOTE]
 > The LLM will not output a response based on the tool output _yust yet_, the next step will enable this!
 
-### Set up the agent loop
+#### Set up the agent loop
 
 This is where our tool becomes truly _agentic_.
 
