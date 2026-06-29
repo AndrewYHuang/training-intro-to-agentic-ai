@@ -87,11 +87,8 @@ if (response.stop_reason === "tool_use") {
 
 There are [many more values](https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons) that the `stop_reason` field can take, but for this exercise we only need to handle `tool_use` and `end_turn`.
 
-### Get available ingredients
-
-The kitchen inventory is stored as an object in `src/tools/get-kitchen-inventory.ts`. The LLM should be able to ask for a list of available ingredients, and the tool should return them.
-
-Add `get_kitchen_inventory` to the tool list, and return the list of ingredients when the LLM calls it.
+> [!NOTE]
+> The LLM will not output a response based on the tool output _yust yet_, the next step will enable this!
 
 ### Set up the agent loop
 
@@ -146,6 +143,12 @@ export async function runAgentTurn(
 ```
 
 </details>
+
+### Get available ingredients
+
+The kitchen inventory is stored as an object in `src/tools/get-kitchen-inventory.ts`. The LLM should be able to ask for a list of available ingredients, and the tool should return them.
+
+Add `get_kitchen_inventory` to the tool list, and return the list of ingredients when the LLM calls it.
 
 ### Get recipe by id
 
